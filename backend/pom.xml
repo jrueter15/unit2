@@ -34,6 +34,18 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
+        <!-- Flyway for database migrations -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
+        <!-- (Optional) Flyway MySQL support — needed for advanced MySQL features -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+        </dependency>
+
         <!-- Bean validation -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -55,7 +67,7 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Optional: Lombok (remember to enable annotation processing in IntelliJ) -->
+        <!-- Optional: Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -72,7 +84,7 @@
 
     <build>
         <plugins>
-            <!-- Needed for mvn spring-boot:run and building an executable JAR -->
+            <!-- Spring Boot plugin for packaging and running -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
