@@ -1,5 +1,5 @@
 CREATE TABLE journal_entries (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     title VARCHAR(255),
     content TEXT,
@@ -7,6 +7,6 @@ CREATE TABLE journal_entries (
     
     CONSTRAINT fk_journal_entries_user
         FOREIGN KEY (user_id)
-        REFERENCES users(id)
+        REFERENCES user(id)
         ON DELETE CASCADE
-);
+) ENGINE=InnoDB;

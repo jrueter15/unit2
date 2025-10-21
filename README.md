@@ -42,7 +42,7 @@
     CREATE USER 'unit_2_user'@'localhost' IDENTIFIED BY 'testpass';
     
     -- Grant unit_2_user the ability to make changes to the db
-    GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, DROP ON unit_2.* TO 'unit_2_user'@'localhost';
+    GRANT ALL PRIVILEGES ON unit_2.* TO 'unit_2_user'@'localhost';
     
     -- Ensure changes are relflected in the system
     FLUSH PRIVILEGES;
