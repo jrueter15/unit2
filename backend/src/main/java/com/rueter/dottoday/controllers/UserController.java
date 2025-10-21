@@ -5,7 +5,10 @@ import com.rueter.dottoday.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.Optional;
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/users")
@@ -40,7 +43,7 @@ public class UserController {
 
         if (userOptional.isPresent()) {
             User existingUser = userOptional.get();
-            existingUser.setUsername(userDetails.getUsername());
+            existingUser.setUserName(userDetails.getUserName());
             existingUser.setPassword(userDetails.getPassword());
             return ResponseEntity.ok(userRepository.save(existingUser));
         } else {
