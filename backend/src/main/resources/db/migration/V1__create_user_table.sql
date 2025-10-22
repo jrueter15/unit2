@@ -9,4 +9,5 @@ CREATE TABLE IF NOT EXISTS authorities (
   authority VARCHAR(50) NOT NULL,
   PRIMARY KEY (user_id, authority),
   CONSTRAINT fk_auth_user FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
