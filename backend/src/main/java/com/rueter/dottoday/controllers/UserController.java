@@ -43,7 +43,7 @@ public class UserController {
 
         if (userOptional.isPresent()) {
             User existingUser = userOptional.get();
-            existingUser.setUserName(userDetails.getUserName());
+            existingUser.setUsername(userDetails.getUsername());
             existingUser.setPassword(userDetails.getPassword());
             return ResponseEntity.ok(userRepository.save(existingUser));
         } else {

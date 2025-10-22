@@ -81,7 +81,8 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- JWT Security -->
+        <!-- Dependencies for Spring Security, JWT, JavaX, ModelMapper -->
+        <!-- Needed for auth -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
