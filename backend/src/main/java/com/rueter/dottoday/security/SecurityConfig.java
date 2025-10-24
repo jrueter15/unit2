@@ -20,15 +20,19 @@ public class SecurityConfig {
     http
       .authorizeHttpRequests(auth -> auth
           .requestMatchers("/public/**").permitAll()
-          .anyRequest().authenticated())
-      .httpBasic(Customizer.withDefaults())   
+
+          // when you're ready, get rid of permit all and switch to authenticated
+          .anyRequest().permitAll())
+
+          //.anyRequest().authenticated())          
+      
+          .httpBasic(Customizer.withDefaults())   
       .csrf(csrf -> csrf.disable());         
     return http.build();
   }
 
   @Bean
   UserDetailsService userDetailsService(DataSource dataSource) {
-    // Uses the tables from schema.sql
     return new JdbcUserDetailsManager(dataSource);
   }
 
