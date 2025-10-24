@@ -1,9 +1,18 @@
 package com.rueter.dottoday.controllers;
 
+import com.rueter.dottoday.dto.LoginRequest;
+import com.rueter.dottoday.dto.LoginResponse;
 import com.rueter.dottoday.models.User;
 import com.rueter.dottoday.repositories.UserRepository;
+import com.rueter.dottoday.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -16,6 +25,64 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    // REGISTER (POST /users/register)
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        // Check if username already exists
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            return ResponseEntity.badRequest().body("Username already exists");
+        }
+
+        // Hash the password
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // Add default role
+        user.getRoles().add("ROLE_USER");
+
+        // Save user and authorities
+        User savedUser = userRepository.save(user);
+
+        return ResponseEntity.ok(savedUser);
+    }
+
+    // LOGIN (POST /users/login)
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            // Authenticate user
+            authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    loginRequest.getUsername(),
+                    loginRequest.getPassword()
+                )
+            );
+
+            // Load user details
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
+
+            // Generate JWT token
+            final String jwt = jwtUtil.generateToken(userDetails);
+
+            // Return token and username
+            return ResponseEntity.ok(new LoginResponse(jwt, userDetails.getUsername()));
+
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(401).body("Invalid username or password");
+        }
+    }
 
     // CREATE (POST)
     @PostMapping
