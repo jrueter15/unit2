@@ -41,8 +41,11 @@
     -- Create a low privilege local user to allow connection to the new db. This is a weak test password.
     CREATE USER 'unit_2_user'@'localhost' IDENTIFIED BY 'testpass';
     
-    -- Grant unit_2_user the ability to make changes to the db
-    GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, DROP ON unit_2.* TO 'unit_2_user'@'localhost';
+    // -- Grant unit_2_user the ability to make changes to the db
+    // GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, DROP ON unit_2.* TO 'unit_2_user'@'localhost';
+
+    -- IDE didn't liek this. We need all privileges
+    GRANT ALL PRIVILEGES ON unit_2.* TO 'unit_2_user'@'localhost';
     
     -- Ensure changes are relflected in the system
     FLUSH PRIVILEGES;
