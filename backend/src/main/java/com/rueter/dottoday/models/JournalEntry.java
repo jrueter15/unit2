@@ -30,7 +30,7 @@ public class JournalEntry {
     @Column(length = 255)
     private String title;
 
-    // Use TEXT in MySQL; JPA @Lob maps nicely
+    // Use TEXT in MySQL; JPA @Lob maps
     @Lob
     @Column(columnDefinition = "TEXT")
     private String content;
