@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -49,10 +48,13 @@ public class UserController {
         // Hash the password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        // Add default role
-        user.getRoles().add("ROLE_USER");
+        // Set enabled to true by default
+        user.setEnabled(true);
 
-        // Save user and authorities
+        // Add default role
+        user.getAuthorities().add("ROLE_USER");
+
+        // Save user (JPA will handle authorities table)
         User savedUser = userRepository.save(user);
 
         return ResponseEntity.ok(savedUser);

@@ -19,14 +19,17 @@ public class User {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String username;  
+    private String username;
 
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private boolean enabled = true;
+
     // store roles/authorities
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "authorities", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "authorities", joinColumns = @JoinColumn(name = "username", referencedColumnName = "username"))
     @Column(name = "authority")
-    private Set<String> roles = new HashSet<>();
+    private Set<String> authorities = new HashSet<>();
 }
