@@ -1,6 +1,7 @@
 import React from 'react'
 import {useState} from 'react'
 import Form from '../Form/Form';
+import { authAPI } from '../../services/api';
 
 // Handles both Signup and Login
 const SignupLogin = ({onAuthSuccess}) => {
@@ -8,34 +9,62 @@ const SignupLogin = ({onAuthSuccess}) => {
   const[loginError, setLoginError] = useState('');
   const[signupError, setSignupError] = useState('');
 
-  // Validation test for empty fields, email regex, and password length
-  const validateForm = ({ name, email, password }) => {
-    if (!name || !email || !password) {
+  // Validation test for empty fields and password length
+  const validateForm = ({ username, password }) => {
+    if (!username || !password) {
       return 'All fields are required.';
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return 'Please enter a valid email address.';
     }
     if (password.length < 6) {
       return 'Password must be at least 6 characters.';
     }
     return null;
   };
- 
-  // Handles form submission
-  const handleForm = (e, setError) => {
+
+  // Handles login submission
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const name = e.target.name.value.trim();
-    const email = e.target.email.value.trim();
+    const username = e.target.name.value.trim();
     const password = e.target.password.value;
-    
-    const error = validateForm({ name, email, password });
+
+    const error = validateForm({ username, password });
     if (error) {
-      setError(error);
-    } else {
-      setError('');
+      setLoginError(error);
+      return;
+    }
+
+    try {
+      const response = await authAPI.login(username, password);
+      localStorage.setItem('jwt', response.token);
+      localStorage.setItem('username', response.username);
+      setLoginError('');
       onAuthSuccess();
+    } catch (err) {
+      setLoginError(err.response?.data?.message || 'Invalid username or password');
+    }
+  };
+
+  // Handles signup submission
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    const username = e.target.name.value.trim();
+    const password = e.target.password.value;
+
+    const error = validateForm({ username, password });
+    if (error) {
+      setSignupError(error);
+      return;
+    }
+
+    try {
+      await authAPI.register(username, password);
+      // After successful registration, automatically log in
+      const response = await authAPI.login(username, password);
+      localStorage.setItem('jwt', response.token);
+      localStorage.setItem('username', response.username);
+      setSignupError('');
+      onAuthSuccess();
+    } catch (err) {
+      setSignupError(err.response?.data?.message || 'Registration failed. Username may already exist.');
     }
   };
   
@@ -43,13 +72,13 @@ const SignupLogin = ({onAuthSuccess}) => {
     <div className="login-signup">
       <Form
         title="Log-in"
-        onSubmit={(e) => handleForm(e, setLoginError)}
+        onSubmit={handleLogin}
         error={loginError}
         buttonText="Login"
       />
       <Form
         title="Sign-up"
-        onSubmit={(e) => handleForm(e, setSignupError)}
+        onSubmit={handleSignup}
         error={signupError}
         buttonText="Sign-Up"
       />
