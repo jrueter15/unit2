@@ -9,10 +9,7 @@ const Form = ({title, onSubmit, error, buttonText}) => {
       <h1>{title}</h1>
       <form onSubmit={onSubmit}>
         <div className="input">
-          <input type="text" name="name" placeholder="Name" required autoComplete="name" />
-        </div>
-        <div className="input">
-          <input type="email" name="email" placeholder="Email" required autoComplete="email" />
+          <input type="text" name="name" placeholder="Username" required autoComplete="username" />
         </div>
         <div className="input">
           <input type="password" name="password" placeholder="Password" required autoComplete="current-password" />
@@ -20,7 +17,7 @@ const Form = ({title, onSubmit, error, buttonText}) => {
         {/* Displays error message on validation fail */}
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <Button type="submit" text={buttonText} />
-      </form>      
+      </form>
     </div>
   )
 }
