@@ -15,17 +15,23 @@ function App() {
     {id: 3, text: "Meditate for 5 minutes", date: "2025-07-03" }
   ];
 
-  // Tracks if the user is logged in, defaults to false
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Tracks if the user is logged in, checks localStorage for existing token
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return !!localStorage.getItem('jwt');
+  });
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+  };
 
   return (
-    <Router>    
+    <Router>
       <div className="container">
         {/*Checks to see if isAuthenticated is true before allowing access to the Navbar and the rest of the app */}
         {isAuthenticated ? (
           <>
             <header>
-              <Navbar />
+              <Navbar onLogout={handleLogout} />
             </header>
             <main>
               <Routes>
