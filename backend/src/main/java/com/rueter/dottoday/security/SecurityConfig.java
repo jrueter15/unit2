@@ -1,13 +1,12 @@
 package com.rueter.dottoday.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-//import org.springframework.security.config.Customizer;
-// currently unused
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -57,6 +56,12 @@ public class SecurityConfig {
       .formLogin(form -> form.disable())
       // Disable HTTP Basic (solving/preventing my 403 on login endpoint)
       .httpBasic(basic -> basic.disable())
+      // Configure exception handling for authentication failures
+      .exceptionHandling(exceptions -> exceptions
+          .authenticationEntryPoint((request, response, authException) -> {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+          })
+      )
       // Add JWT filter before UsernamePasswordAuthenticationFilter
       .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
