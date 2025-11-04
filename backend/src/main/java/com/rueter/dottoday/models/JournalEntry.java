@@ -1,5 +1,6 @@
 package com.rueter.dottoday.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class JournalEntry {
     private Long id;
 
     // FK to users.id (BIGINT)
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
         name = "user_id",
