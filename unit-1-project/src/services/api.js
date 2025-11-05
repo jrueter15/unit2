@@ -35,6 +35,11 @@ export const authAPI = {
     const response = await api.post('/users/login', { username, password });
     return response.data;
   },
+
+  deleteCurrentUser: async () => {
+    const response = await api.delete('/users/me');
+    return response.data;
+  },
 };
 
 // Journal Entry API calls
