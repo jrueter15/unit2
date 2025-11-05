@@ -34,7 +34,7 @@ const SignupLogin = ({onAuthSuccess}) => {
 
     try {
       const response = await authAPI.login(username, password);
-      localStorage.setItem('jwt', response.token);
+      localStorage.setItem('token', response.token);
       localStorage.setItem('username', response.username);
       setLoginError('');
       onAuthSuccess();
@@ -59,7 +59,7 @@ const SignupLogin = ({onAuthSuccess}) => {
       await authAPI.register(username, password);
       // After successful registration, automatically log in
       const response = await authAPI.login(username, password);
-      localStorage.setItem('jwt', response.token);
+      localStorage.setItem('token', response.token);
       localStorage.setItem('username', response.username);
       setSignupError('');
       onAuthSuccess();

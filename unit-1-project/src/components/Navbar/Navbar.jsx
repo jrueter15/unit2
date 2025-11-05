@@ -8,7 +8,7 @@ const Navbar = ({onLogout}) => {
   const dropdownRef = useRef(null);
 
   const handleLogout = () => {
-    localStorage.removeItem('jwt');
+    localStorage.removeItem('token');
     localStorage.removeItem('username');
     onLogout();
   };
