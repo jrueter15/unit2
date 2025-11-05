@@ -17,7 +17,7 @@ function App() {
 
   // Tracks if the user is logged in, checks localStorage for existing token
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return !!localStorage.getItem('jwt');
+    return !!localStorage.getItem('token');
   });
 
   const handleLogout = () => {
