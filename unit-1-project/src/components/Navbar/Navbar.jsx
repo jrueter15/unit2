@@ -1,5 +1,6 @@
 import {Link} from 'react-router-dom';
 import {useState, useEffect, useRef} from 'react';
+import * as api from '../../services/api.js';
 
 // Navbar component for header/title and router links
 const Navbar = ({onLogout}) => {
@@ -11,6 +12,25 @@ const Navbar = ({onLogout}) => {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     onLogout();
+  };
+
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm(
+      'Are you sure you want to delete your account? This action cannot be undone and will delete all your journal entries.'
+    );
+
+    if (confirmed) {
+      try {
+        await api.authAPI.deleteCurrentUser();
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        alert('Account deleted successfully');
+        onLogout();
+      } catch (err) {
+        console.error('Error deleting account:', err);
+        alert('Failed to delete account. Please try again.');
+      }
+    }
   };
 
   // Close dropdown when clicking outside
@@ -50,6 +70,7 @@ const Navbar = ({onLogout}) => {
         {dropdownOpen && (
           <div className="dropdown-menu">
             <button onClick={handleLogout}>Logout</button>
+            <button onClick={handleDeleteAccount} className="delete-account-btn">Delete Account</button>
           </div>
         )}
       </div>
