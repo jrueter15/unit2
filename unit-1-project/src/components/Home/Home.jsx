@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from "react";
 import Button from '../Button/Button';
+import * as api from '../../services/api.js';
 
 // Home component will display past wins (currently suggested wins) and daily dots/logs the user adds
 // The component will also allow editing and deleting
@@ -21,16 +22,25 @@ const Home = ({wins}) => {
     "Consistency beats intensity"
   ];
 
-  // State for logs using local storage
-  const [logs, setLogs] = useState(() => {
-    const storedLogs = localStorage.getItem("dailyLogs");
-    return storedLogs ? JSON.parse(storedLogs) : [];
-  })
+  // State for journal entries and error handling
+  const [entries, setEntries] = useState([]);
+  const [error, setError] = useState("");
 
-  // Sync logs state to local storage
+  // No longer syncs logs to local storage, but fetches all entries on mount
+  // Uses api.js calls
   useEffect(() => {
-    localStorage.setItem("dailyLogs", JSON.stringify(logs));
-  }, [logs]);
+    const fetchEntries = async () => {
+      try {
+        const data = await api.journalAPI.getAllEntries();
+        setEntries(data);
+      } catch (err) {
+        console.error('Error fetching journal entries:', err);
+        setError('Failed to load journal entries.');
+      }
+    };
+    fetchEntries();
+  }, []);
+
 
   // State for new input and editing
   const [inputValue, setInputValue] = useState("");
@@ -43,22 +53,32 @@ const Home = ({wins}) => {
     setInputValue(e.target.value);
   }
 
-  // Function for adding a log
-  function addLog(e){
+  // Function for adding a journal entry
+  const addLog = async (e) => {
     e.preventDefault();
     if(inputValue.trim() !== ""){
-      setLogs((prevLogs) => [...prevLogs, inputValue]);
-      setInputValue("");
+      try {
+        const newEntry = await api.journalAPI.createEntry({
+          content: inputValue,
+          title: "" // Optional: could add a title field later
+        });
+        setEntries((prevEntries) => [...prevEntries, newEntry]);
+        setInputValue("");
+        setError("");
 
-      const randomMessage = encouragingMessageArray[Math.floor(Math.random() * encouragingMessageArray.length)];
-      setEncouragement(randomMessage);
+        const randomMessage = encouragingMessageArray[Math.floor(Math.random() * encouragingMessageArray.length)];
+        setEncouragement(randomMessage);
+      } catch (err) {
+        console.error('Error creating entry:', err);
+        setError('Failed to create journal entry.');
+      }
     }
-  }
+  };
   
-  // function for editing specific log
-  function startEditing(index) {
-    setCurrentlyEditingIndex(index);
-    setTempEditValue(logs[index]);
+  // function for editing specific entry
+  function startEditing(id, content) {
+    setCurrentlyEditingIndex(id);
+    setTempEditValue(content);
   }
 
   // function for handling editing changes
@@ -67,20 +87,33 @@ const Home = ({wins}) => {
   }
 
   // function to save the edits
-  function saveEdit(index) {
-    const updatedLogs = logs.map((log, i) =>
-      i === index ? tempEditValue : log
-    );
-    setLogs(updatedLogs);
-    setCurrentlyEditingIndex(null);
-    setTempEditValue("");
-  }
+  const saveEdit = async (id) => {
+    try {
+      const updatedEntry = await api.journalAPI.updateEntry(id, {
+        content: tempEditValue,
+        title: ""
+      });
+      setEntries((prevEntries) =>
+        prevEntries.map((entry) => (entry.id === id ? updatedEntry : entry))
+      );
+      setCurrentlyEditingIndex(null);
+      setTempEditValue("");
+      setError("");
+    } catch (err) {
+      console.error('Error updating entry:', err);
+      setError('Failed to update journal entry.');
+    }
+  };
 
-  // function to delete a specific log at index
-  function deleteLog(index){
-    const updatedLogs = logs.filter((element, i) => i !== index)
-    setLogs(updatedLogs);
-  }
+   const handleDelete = async (id) => {
+    try {
+      await api.journalAPI.deleteEntry(id);
+      setEntries((prev) => prev.filter((entry) => entry.id !== id));
+    } catch (err) {
+      console.error('Error deleting entry:', err);
+      setError('Failed to delete journal entry.');
+    }
+  };
 
   return (
     <div className="home">
@@ -120,20 +153,20 @@ const Home = ({wins}) => {
 
       <br></br>
       {encouragement && <p className="encouragement">{encouragement}</p>}
+      {error && <p className="error-message">{error}</p>}
 
-      {/* Display list of logs */}
+      {/* Display list of journal entries */}
       <div className="daily-log-output">
-        <h1>Dot Archive ({logs.length})</h1>
+        <h1>Dot Archive ({entries.length})</h1>
         <div className="dots-archive">
-            {logs.map((element, index) => (
-              <span key={index}>•</span>
+            {entries.map((entry) => (
+              <span key={entry.id}>•</span>
             ))}
         </div>
-        <Button text="Clear All" onClick={() => setLogs([])} />
         <ol>
-          {logs.map((log, index) =>
-            <li key={index}>
-              {currentlyEditingIndex === index ? (
+          {entries.map((entry) =>
+            <li key={entry.id}>
+              {currentlyEditingIndex === entry.id ? (
                 <>
                   <input
                     type="text"
@@ -142,16 +175,16 @@ const Home = ({wins}) => {
                   />
                   <Button
                     text="Save"
-                    onClick={() => saveEdit(index)}
+                    onClick={() => saveEdit(entry.id)}
                   />
                 </>
               ):(
-                // Displays log along with edit and delete buttons
+                // Displays entry along with edit and delete buttons
                 <>
-                  <span className="text">{log}</span>
+                  <span className="text">{entry.content}</span>
                   <div className="log-buttons">
-                    <Button text="Edit" onClick={() => startEditing(index)} />
-                    <Button text="Delete" onClick={() => deleteLog(index)}/>
+                    <Button text="Edit" onClick={() => startEditing(entry.id, entry.content)} />
+                    <Button text="Delete" onClick={() => handleDelete(entry.id)}/>
                   </div>
                 </>
               )}
