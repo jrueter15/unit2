@@ -10,10 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
 import java.util.List;
@@ -126,8 +129,21 @@ public class UserController {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
             return ResponseEntity.noContent().build();
+     
+     
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    // DELETE current user
+    @DeleteMapping("/me")
+    public ResponseEntity<String> deleteCurrentUser(Authentication authentication) {
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        userRepository.deleteById(user.getId());
+        return ResponseEntity.ok("Account deleted successfully");
     }
 }
