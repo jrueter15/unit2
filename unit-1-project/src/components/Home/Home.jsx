@@ -1,9 +1,10 @@
 import React from 'react';
 import { useState, useEffect } from "react";
 import Button from '../Button/Button';
+import Modal from '../Modal/Modal';
 import * as api from '../../services/api.js';
 
-// Home component will display past wins (currently suggested wins) and daily dots/logs the user adds
+// Home component will display suggested wins and daily dots/journals the user adds
 // The component will also allow editing and deleting
 
 const Home = ({wins}) => {
@@ -22,12 +23,16 @@ const Home = ({wins}) => {
     "Consistency beats intensity"
   ];
 
+  // State for modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [entryToDelete, setEntryToDelete] = useState(null);
+
   // State for journal entries and error handling
   const [entries, setEntries] = useState([]);
   const [error, setError] = useState("");
 
   // No longer syncs logs to local storage, but fetches all entries on mount
-  // Uses api.js calls
+  // Uses api.js
   useEffect(() => {
     const fetchEntries = async () => {
       try {
@@ -60,7 +65,7 @@ const Home = ({wins}) => {
       try {
         const newEntry = await api.journalAPI.createEntry({
           content: inputValue,
-          title: "" // Optional: could add a title field later
+          title: "" // Potential title field
         });
         setEntries((prevEntries) => [...prevEntries, newEntry]);
         setInputValue("");
@@ -105,18 +110,34 @@ const Home = ({wins}) => {
     }
   };
 
-   const handleDelete = async (id) => {
+  const handleDeleteClick = (id) => {
+    setEntryToDelete(id);
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
     try {
-      await api.journalAPI.deleteEntry(id);
-      setEntries((prev) => prev.filter((entry) => entry.id !== id));
+      await api.journalAPI.deleteEntry(entryToDelete);
+      setEntries((prev) => prev.filter((entry) => entry.id !== entryToDelete));
+      setIsModalOpen(false);
+      setEntryToDelete(null);
     } catch (err) {
       console.error('Error deleting entry:', err);
       setError('Failed to delete journal entry.');
+      setIsModalOpen(false);
     }
   };
 
   return (
     <div className="home">
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Journal Entry"
+        message="Are you sure you want to delete this journal entry? This action cannot be undone."
+      />        
+      
       <div className="photo">
         <img 
           src="https://images.unsplash.com/photo-1456324504439-367cee3b3c32?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -136,7 +157,7 @@ const Home = ({wins}) => {
           <ul>
             {wins.map(win => (
               <li key={win.id}>{win.text}</li>
-            ))}    
+            ))}
           </ul>
       </div>
 
@@ -181,10 +202,12 @@ const Home = ({wins}) => {
               ):(
                 // Displays entry along with edit and delete buttons
                 <>
-                  <span className="text">{entry.content}</span>
+                  <span className="text">
+                    {entry.content}
+                  </span>
                   <div className="log-buttons">
                     <Button text="Edit" onClick={() => startEditing(entry.id, entry.content)} />
-                    <Button text="Delete" onClick={() => handleDelete(entry.id)}/>
+                    <Button text="Delete" onClick={() => handleDeleteClick(entry.id)}/>
                   </div>
                 </>
               )}
@@ -192,6 +215,23 @@ const Home = ({wins}) => {
           )}
         </ol>
       </div>
+
+            {/* AI Weekly Summary Section */}
+      <div className="weekly-summary">
+        <br></br>
+        <h2>AI Weekly Summary</h2>
+        <Button
+          text={loadingSummary ? "Generating..." : "Generate Weekly Summary"}
+          onClick={fetchWeeklySummary}
+          disabled={loadingSummary}
+        />
+        {weeklySummary && (
+          <div className="summary-content">
+            <p>{weeklySummary}</p>
+          </div>
+        )}
+      </div>
+
     </div>
   )
 }
