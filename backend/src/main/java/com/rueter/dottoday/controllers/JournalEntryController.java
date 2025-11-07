@@ -4,12 +4,14 @@ import com.rueter.dottoday.models.JournalEntry;
 import com.rueter.dottoday.models.User;
 import com.rueter.dottoday.repositories.JournalEntryRepository;
 import com.rueter.dottoday.repositories.UserRepository;
+import com.rueter.dottoday.services.AiSummaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -21,6 +23,9 @@ public class JournalEntryController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AiSummaryService aiSummaryService;
 
     // CREATE — POST
     @PostMapping
@@ -95,6 +100,20 @@ public class JournalEntryController {
 
         journalEntryRepository.deleteById(id);
         return "Journal entry deleted successfully.";
+    }
+
+    // AI weekly summary — GET
+    @GetMapping("/weekly-summary")
+    public String getWeeklySummary(Authentication authentication) {
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Get entries from the past 7 days
+        LocalDateTime oneWeekAgo = LocalDateTime.now().minusDays(7);
+        List<JournalEntry> weeklyEntries = journalEntryRepository.findByUserIdAndDateCreatedAfter(user.getId(), oneWeekAgo);
+
+        return aiSummaryService.generateWeeklySummary(weeklyEntries);
     }
 
 
