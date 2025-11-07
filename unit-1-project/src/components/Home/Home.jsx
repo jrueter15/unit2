@@ -31,6 +31,10 @@ const Home = ({wins}) => {
   const [entries, setEntries] = useState([]);
   const [error, setError] = useState("");
 
+  // State for AI weekly summary
+  const [weeklySummary, setWeeklySummary] = useState("");
+  const [loadingSummary, setLoadingSummary] = useState(false);
+
   // No longer syncs logs to local storage, but fetches all entries on mount
   // Uses api.js
   useEffect(() => {
@@ -45,7 +49,6 @@ const Home = ({wins}) => {
     };
     fetchEntries();
   }, []);
-
 
   // State for new input and editing
   const [inputValue, setInputValue] = useState("");
@@ -125,6 +128,21 @@ const Home = ({wins}) => {
       console.error('Error deleting entry:', err);
       setError('Failed to delete journal entry.');
       setIsModalOpen(false);
+    }
+  };
+
+  // Function to fetch AI weekly summary
+  const fetchWeeklySummary = async () => {
+    setLoadingSummary(true);
+    try {
+      const summary = await api.journalAPI.getWeeklySummary();
+      setWeeklySummary(summary);
+      setError("");
+    } catch (err) {
+      console.error('Error fetching weekly summary:', err);
+      setError('Failed to generate weekly summary.');
+    } finally {
+      setLoadingSummary(false);
     }
   };
 
@@ -216,7 +234,7 @@ const Home = ({wins}) => {
         </ol>
       </div>
 
-            {/* AI Weekly Summary Section */}
+      {/* AI Weekly Summary */}
       <div className="weekly-summary">
         <br></br>
         <h2>AI Weekly Summary</h2>
