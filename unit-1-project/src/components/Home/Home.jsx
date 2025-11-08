@@ -55,7 +55,7 @@ const Home = ({wins}) => {
   const [currentlyEditingIndex, setCurrentlyEditingIndex] = useState(null);
   const [tempEditValue, setTempEditValue] = useState("");
   const [encouragement, setEncouragement] = useState("");
-
+  
   // Handles typing
   function handleInputChange(e){
     setInputValue(e.target.value);
@@ -129,6 +129,19 @@ const Home = ({wins}) => {
       setError('Failed to delete journal entry.');
       setIsModalOpen(false);
     }
+  };
+
+  // Format date and time for display
+  const formatDateTime = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
   };
 
   // Function to fetch AI weekly summary
@@ -221,6 +234,8 @@ const Home = ({wins}) => {
                 // Displays entry along with edit and delete buttons
                 <>
                   <span className="text">
+                    <span className="entry-date">{formatDateTime(entry.dateCreated)}</span>
+                    {" - "}
                     {entry.content}
                   </span>
                   <div className="log-buttons">
