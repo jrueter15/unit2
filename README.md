@@ -132,9 +132,7 @@ Dot.Today is a full-stack habit journal that helps people build better identitie
 
 <iframe width="560" height="315" src='https://dbdiagram.io/e/690d39246735e11170a56fb0/690d5d0c6735e11170a8df09'> </iframe>
 
-- https://dbdiagram.io/d/LC-Unit-2-ERD-V2-690d39246735e11170a56fb0
-[ERD][ERD_Link]
-[ERD_Link]: https://dbdiagram.io/d/LC-Unit-2-ERD-V2-690d39246735e11170a56fb0
+https://dbdiagram.io/d/LC-Unit-2-ERD-V2-690d39246735e11170a56fb0
 [ERD](https://dbdiagram.io/d/LC-Unit-2-ERD-V2-690d39246735e11170a56fb0)
 ![ERD](https://dbdiagram.io/d/LC-Unit-2-ERD-V2-690d39246735e11170a56fb0)
 
