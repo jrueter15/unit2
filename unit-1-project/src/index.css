@@ -103,6 +103,7 @@ body {
   /* Fixed while scrolling */
   background-attachment: fixed;
   text-align: center;
+  overflow-x: hidden;
 }
 
 /* Main container using grid with header, main, and footer */
@@ -122,14 +123,50 @@ ol, ul{
   list-style: none;
 }
 
-.daily-log-output, .daily-log-input, .suggested-dots{
+/* Stops long text from altering/breaking UI */
+.daily-log-output, .daily-log-input, .suggested-dots, .weekly-summary{
   padding-top: 5vh;
+  max-width: 100%;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
+.weekly-summary .summary-content{
+  margin-top: 20px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  text-align: left;
+}
+
+/* Made it similar to double spacing */
 .daily-log-output ol li{
   display: flex;
   justify-content: space-between;
   padding: 8px;
+  gap: 10px;
+  max-width: 100%;
+}
+
+/* Stops long text from altering/breaking UI */
+.daily-log-output ol li .text{
+  word-break: break-word;
+  overflow-wrap: break-word;
+  flex: 1;
+  text-align: left;
+  max-width: 100%;
+}
+
+/* Grey bold so entry date is easily seen*/
+.entry-date{
+  font-weight: bold;
+  color: #555;
+  font-size: 1.1em;
 }
 
 .log-buttons{
@@ -172,10 +209,23 @@ ol, ul{
   justify-content: center;
 }
 
+/* Stops long text from altering/breaking UI */
 .about, .home{
   padding: 10px;
   background-color: #e5e2e283;
-  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.188);    
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.188);
+  max-width: 100%;
+  overflow-x: hidden;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 2;
+}
+
+.about {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 30px;
 }
 
 .photo{
@@ -185,6 +235,7 @@ ol, ul{
 .calendar-page{
   background-color: #e5e2e283;
   font-size: 1.5rem;
+  padding: 20px;
 }
 
 .react-calendar__month-view__days__day {
@@ -196,10 +247,151 @@ ol, ul{
   padding: 10px;
 }
 
+/* Calendar tile with entries formatting - light blue background and dot */
+.react-calendar__tile.has-entries {
+  background-color: #b3d9ff !important;
+  border-radius: 8px;
+  position: relative;
+}
+
+.react-calendar__tile.has-entries:hover {
+  background-color: #99ccff !important;
+}
+
+.react-calendar__tile.has-entries.react-calendar__tile--active {
+  background-color: #66b3ff !important;
+}
+
+/* Calendar dot positioned vertically centered, right side */
+.calendar-dot {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 8px;
+  color: #000000;
+  font-size: 2.0rem;
+  line-height: 1;
+  font-weight: bold;
+}
+
+/* Selected date */
+.selected-date-section {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.date-entries {
+  margin-top: 20px;
+}
+
+.date-entries ul {
+  list-style: none;
+  padding: 0;
+}
+
+.date-entry-item {
+  background-color: rgba(245, 245, 245, 0.9);
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border-left: 4px solid #4CAF50;
+  text-align: left;
+}
+
+/* Formatting for time/date entries are grey and bolded to be easily seen */
+.entry-time {
+  font-weight: bold;
+  color: #555;
+  font-size: 1.1em;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.date-entry-item p {
+  margin: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Modal overlay - covers screen with semi-transparent background while modal is open*/
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+}
+
+.modal-content h2 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.modal-content p {
+  margin-bottom: 25px;
+  color: #666;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+/* Confirm button - red to stand out */
+.modal-confirm-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modal-confirm-button:hover {
+  background-color: #c82333;
+  transform: scale(1.05);
+}
+
+/* Cancel button - neutral color */
+.modal-cancel-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modal-cancel-button:hover {
+  background-color: #5a6268;
+  transform: scale(1.05);
+}
+
  /* Mobile styling */
 @media (max-width: 480px) {
   body {
-    background-size: cover;  
+    background-size: cover;
   }
 
   .login-signup {
@@ -229,13 +421,53 @@ ol, ul{
     font-size: 1rem;
     padding: 5px;
   }
+
+  /* Weekly summary responsive adjustments */
+  .weekly-summary .summary-content {
+    max-width: 95%;
+    padding: 15px;
+    font-size: 0.95rem;
+  }
+
+  /* Entry date smaller on mobile */
+  .entry-date {
+    font-size: 0.75em;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  /* Stack journal entries better on mobile */
+  .daily-log-output ol li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .log-buttons {
+    margin-top: 10px;
+  }
+
+  /* Calendar responsive adjustments */
+  .selected-date-section {
+    max-width: 95%;
+    padding: 15px;
+  }
+
+  .date-entry-item {
+    padding: 12px;
+  }
+
+  /* Adjust calendar dot size for mobile */
+  .calendar-dot {
+    font-size: 1.0rem;
+    right: 4px;
+  }
 }
 
 /* Styling for tablets */
 @media (min-width: 481px) and (max-width: 768px) {
-  
+
   body {
-    background-size: cover; 
+    background-size: cover;
   }
 
   footer ul li {
@@ -254,5 +486,28 @@ ol, ul{
   .react-calendar__navigation button {
     font-size: 1rem;
     padding: 5px;
+  }
+
+  /* Weekly summary responsive adjustments for tablets */
+  .weekly-summary .summary-content {
+    max-width: 90%;
+    padding: 18px;
+  }
+
+  /* Entry date adjustment for tablets */
+  .entry-date {
+    font-size: 0.95em;
+  }
+
+  /* Calendar responsive adjustments for tablets */
+  .selected-date-section {
+    max-width: 90%;
+    padding: 18px;
+  }
+
+  /* Adjust calendar dot size for tablets */
+  .calendar-dot {
+    font-size: 1.5rem;
+    right: 6px;
   }
 }

@@ -75,6 +75,26 @@ Dot.Today is a full-stack habit journal that helps people build better identitie
 
 ## Setup
 
+### Prerequisites
+
+Before you begin, you need the following installed on your system:
+
+- **Node.js** (v18 or higher)
+- **Java Development Kit (JDK) 21**
+- **MySQL Server** (v8.0 or higher)
+- **Maven**
+
+## Installation
+
+### 1. Clone the Repository
+
+```bash
+git clone <git@github.com:jrueter15/unit2.git>
+cd unit2
+```
+
+### 2. Database Setup
+
 - Setup instructions
 
   - Configure MySQL using a CLI install
@@ -127,6 +147,82 @@ Dot.Today is a full-stack habit journal that helps people build better identitie
     -- Ensure changes are reflected in the system
     FLUSH PRIVILEGES;
     ```
+
+### 3. Backend Setup
+
+Navigate to the backend and build the project:
+
+```bash
+cd backend
+./mvn clean install
+```
+
+Configure database connection in `src/main/resources/application.properties` if needed
+
+Start the Spring Boot application:
+
+```bash
+./mvn spring-boot:run
+```
+
+The backend API is at `http://localhost:8080`
+
+### 4. Frontend Setup
+
+Navigate to the frontend:
+
+```bash
+cd unit-1-project
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+The frontend is at `http://localhost:5173`
+
+### 5. Verify Installation
+
+- Go to `http://localhost:5173` in your browser
+- You should see the Dot.Today landing page
+- Try registering an account and/or logging in
+- The backend API endpoints are at `http://localhost:8080/api`
+
+## Common Commands
+
+### Backend (from `/backend` directory)
+
+```bash
+# Build the project
+./mvn clean package
+
+# Run the application
+./mvn spring-boot:run
+```
+
+### Frontend (from `/unit-1-project` directory)
+
+```bash
+# Install dependencies
+npm install
+
+# Run dev server (with hot reload)
+npm run dev
+```
+
+## Troubleshooting
+
+- **MySQL Connection Issues**: Ensure MySQL is running and credentials in `application.properties` match your database setup
+- **Port Conflicts**: If port 8080 or 5173 is already in use, you can change them in `application.properties` (backend) or `vite.config.js` (frontend)
+- **Flyway Migration Errors**: Check that the `unit_2_user` has sufficient privileges on the `unit_2` database
 
 ## Wireframe
 
