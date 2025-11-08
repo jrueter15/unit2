@@ -1,7 +1,5 @@
 <img src="https://images.unsplash.com/photo-1456324504439-367cee3b3c32?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Person journaling" title="Person journaling"/>
 
-# unit-2-project-dotToday
-
 <div align="center">
   <h1>Dot.Today - a Full-Stack Application</h1>
 </div>
@@ -38,7 +36,7 @@
 
 ## About
 
-dotToday is a full-stack habit journal that helps people build better identities through small daily wins. Inspired by James Clear's Atomic Habits, it lets users log their 'dots', those small victories that can compound over time to reshape your life. Built with Spring Boot and React, it features Java Web Token (JWT) authentication, a MySQL database, and a user interface for tracking progress. Every entry is a dot on your journey to becoming who you want to be."
+Dot.Today is a full-stack habit journal that helps people build better identities through small daily wins. Inspired by James Clear's Atomic Habits, it lets users log their 'dots', those small victories that can compound over time to reshape your life. Built with Spring Boot and React, it features Java Web Token (JWT) authentication, a MySQL database, and a user interface for tracking progress. Every entry is a dot on your journey to becoming who you want to be."
 
 ## Features
 
@@ -81,11 +79,11 @@ dotToday is a full-stack habit journal that helps people build better identities
 
   - Configure MySQL using a CLI install
   - Run `mysql_secure_installation` to configure the new install
-  - Set a decent root password. Set a basic one for the time being.
+  - Set a root password
   - Disallow remote root login
   - Remove anon users
   - Remove test database
-  - Login as root (enter the pass you chose above):
+  - Login as root (enter the password you chose above):
 
     ```bash
     mysql -u root -p
@@ -114,19 +112,19 @@ dotToday is a full-stack habit journal that helps people build better identities
     ```sql
     -- Database for the app (copy the line and hit enter to create the database)
     CREATE DATABASE unit_2 CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-    -- Now have a db called "unit_2". You can view it and all the other default dbs by running the following:
+    -- Now have a database called "unit_2". You can view it and all the other default databases by running the following:
     SHOW DATABASES;
 
-    -- Create a low privilege local user to allow connection to the new db. This is a weak test password.
+    -- Create a low privilege local user to allow connection to the new database. This is a weak test password.
     CREATE USER 'unit_2_user'@'localhost' IDENTIFIED BY 'testpass';
 
-    // -- Grant unit_2_user the ability to make changes to the db
+    // -- Grant unit_2_user the ability to make changes to the database
     // GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, DROP ON unit_2.* TO 'unit_2_user'@'localhost';
 
-    -- IDE didn't liek this. We need all privileges
+    --  Grant all privileges
     GRANT ALL PRIVILEGES ON unit_2.* TO 'unit_2_user'@'localhost';
 
-    -- Ensure changes are relflected in the system
+    -- Ensure changes are reflected in the system
     FLUSH PRIVILEGES;
     ```
 
@@ -134,13 +132,17 @@ dotToday is a full-stack habit journal that helps people build better identities
 
 <iframe width="560" height="315" src='https://dbdiagram.io/e/690d39246735e11170a56fb0/690d5d0c6735e11170a8df09'> </iframe>
 
+https://dbdiagram.io/d/LC-Unit-2-ERD-V2-690d39246735e11170a56fb0
+
 ## Future Features
 
 - Additional fields for journal entries to allow for keywords, sorting, etc.
-- In-depth dashboard
 - Emotes/Categorization of entries
+- In-depth UI dashboard to watch categorized entries add up in a specific area
 - Search or sorting of entries
 - Prompts to get the user started
+- AI prompts to cue reflections
+- AI soundboard for reflection and discussion
 - Sharing with others feature to create a community
 - Light and dark mode to simulate a morning and evening mode with different cues "What's one intention for today?" and "What did you feel proud of today?"
 - Timer for distraction-free reflection
