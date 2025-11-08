@@ -40,7 +40,7 @@
             <artifactId>flyway-core</artifactId>
         </dependency>
 
-        <!-- (Optional) Flyway MySQL support — needed for advanced MySQL features -->
+        <!-- Flyway MySQL support -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-mysql</artifactId>
@@ -59,7 +59,7 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Optional: hot reload during dev -->
+        <!-- Hot reload -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -67,7 +67,7 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Optional: Lombok -->
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -109,7 +109,7 @@
         <dependency>
             <groupId>com.google.genai</groupId>
             <artifactId>google-genai</artifactId>
-            <version>0.2.0</version> <!-- {x-version-update:google-genai:released} -->
+            <version>0.2.0</version>
         </dependency>
 
     </dependencies>
@@ -120,6 +120,32 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <environmentVariables>
+                        <GOOGLE_API_KEY>${GOOGLE_API_KEY}</GOOGLE_API_KEY>
+                    </environmentVariables>
+                </configuration>
+            </plugin>
+
+            <!-- Load environment variables from app.env file -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>../app.env</file>
+                            </files>
+                            <quiet>true</quiet>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
