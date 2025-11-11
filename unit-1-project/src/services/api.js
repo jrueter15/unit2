@@ -67,11 +67,6 @@ export const journalAPI = {
   deleteEntry: async (id) => {
     await api.delete(`/api/journal-entries/${id}`);
   },
-
-  getWeeklySummary: async () => {
-    const response = await api.get('/api/journal-entries/weekly-summary');
-    return response.data;
-  },
 };
 
 export default api;

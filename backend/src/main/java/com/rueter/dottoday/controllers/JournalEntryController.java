@@ -4,14 +4,12 @@ import com.rueter.dottoday.models.JournalEntry;
 import com.rueter.dottoday.models.User;
 import com.rueter.dottoday.repositories.JournalEntryRepository;
 import com.rueter.dottoday.repositories.UserRepository;
-import com.rueter.dottoday.services.AiSummaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -24,16 +22,34 @@ public class JournalEntryController {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private AiSummaryService aiSummaryService;
+    // DRY - Get authenticated user from Authentication object
+    private User getAuthenticatedUser(Authentication authentication) {
+        String username = authentication.getName();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    }
+
+    // DRY - Verify that the user owns the journal entry
+    private void verifyOwnership(JournalEntry entry, User user) {
+        if (!entry.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                "You don't have permission to access this entry");
+        }
+    }
+
+    // DRY - Get entry by ID and verify ownership
+    private JournalEntry getOwnedEntryById(Long id, User user) {
+        JournalEntry entry = journalEntryRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found"));
+
+        verifyOwnership(entry, user);
+        return entry;
+    }
 
     // CREATE — POST
     @PostMapping
     public JournalEntry createJournalEntry(@RequestBody JournalEntry entry, Authentication authentication) {
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
+        User user = getAuthenticatedUser(authentication);
         entry.setUser(user);
         return journalEntryRepository.save(entry);
     }
@@ -41,80 +57,37 @@ public class JournalEntryController {
     // READ — GET all (only current user's entries)
     @GetMapping
     public List<JournalEntry> getAllJournalEntries(Authentication authentication) {
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
+        User user = getAuthenticatedUser(authentication);
         return journalEntryRepository.findByUserId(user.getId());
     }
 
     // READ — GET one by ID (only if owned by current user)
     @GetMapping("/{id}")
     public JournalEntry getJournalEntryById(@PathVariable Long id, Authentication authentication) {
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-        JournalEntry entry = journalEntryRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found"));
-
-        if (!entry.getUser().getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have permission to access this entry");
-        }
-
-        return entry;
+        User user = getAuthenticatedUser(authentication);
+        return getOwnedEntryById(id, user);
     }
 
     // UPDATE — PUT (only if owned by current user)
     @PutMapping("/{id}")
     public JournalEntry updateJournalEntry(@PathVariable Long id, @RequestBody JournalEntry updatedEntry, Authentication authentication) {
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        User user = getAuthenticatedUser(authentication);
+        JournalEntry entry = getOwnedEntryById(id, user);
 
-        return journalEntryRepository.findById(id)
-                .map(entry -> {
-                    if (!entry.getUser().getId().equals(user.getId())) {
-                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have permission to update this entry");
-                    }
-                    entry.setTitle(updatedEntry.getTitle());
-                    entry.setContent(updatedEntry.getContent());
-                    return journalEntryRepository.save(entry);
-                })
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found"));
+        entry.setTitle(updatedEntry.getTitle());
+        entry.setContent(updatedEntry.getContent());
+        return journalEntryRepository.save(entry);
     }
 
     // DELETE — DELETE (only if owned by current user)
     @DeleteMapping("/{id}")
     public String deleteJournalEntry(@PathVariable Long id, Authentication authentication) {
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-        JournalEntry entry = journalEntryRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found"));
-
-        if (!entry.getUser().getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have permission to delete this entry");
-        }
+        User user = getAuthenticatedUser(authentication);
+        // Verify ownership before deleting
+        getOwnedEntryById(id, user);
 
         journalEntryRepository.deleteById(id);
         return "Journal entry deleted successfully.";
     }
-
-    // AI weekly summary — GET
-    @GetMapping("/weekly-summary")
-    public String getWeeklySummary(Authentication authentication) {
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-        // Get entries from the past 7 days
-        LocalDateTime oneWeekAgo = LocalDateTime.now().minusDays(7);
-        List<JournalEntry> weeklyEntries = journalEntryRepository.findByUserIdAndDateCreatedAfter(user.getId(), oneWeekAgo);
-
-        return aiSummaryService.generateWeeklySummary(weeklyEntries);
-    }
-
 
 }
