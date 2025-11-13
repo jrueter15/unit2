@@ -14,8 +14,8 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    // Token valid for 5 hours
-    private static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+    // Token valid for 3 hours
+    private static final long JWT_TOKEN_VALIDITY = 3 * 60 * 60;
 
     // Secret key for signing tokens should move it to application.properties later
     private String SECRET_KEY = "SecretKeyForJWTTokenGeneration";

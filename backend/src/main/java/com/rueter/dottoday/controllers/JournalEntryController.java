@@ -79,7 +79,7 @@ public class JournalEntryController {
         return journalEntryRepository.save(entry);
     }
 
-    // DELETE — DELETE (only if owned by current user)
+    // DELETE — only if owned by current user
     @DeleteMapping("/{id}")
     public String deleteJournalEntry(@PathVariable Long id, Authentication authentication) {
         User user = getAuthenticatedUser(authentication);

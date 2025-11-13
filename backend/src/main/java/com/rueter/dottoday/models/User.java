@@ -15,6 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class User {
 
+    // PK
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,6 +23,7 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
 
+    // Can be written by JSON input (registration) but won't show in JSON responses
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false)
     private String password;
@@ -29,7 +31,7 @@ public class User {
     @Column(nullable = false)
     private boolean enabled = true;
 
-    // store roles/authorities
+    // roles/authorities - always fetch from DB, linked by username FK, no duplicate username/role combinations
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "authorities", joinColumns = @JoinColumn(name = "username", referencedColumnName = "username"))
     @Column(name = "authority")

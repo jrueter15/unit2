@@ -63,19 +63,22 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         if (username != null && jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
+                
+                // Token valid, set authentication
                 if (jwtUtil.validateToken(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities()
                         );
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    // Spring Security local storage - recognizes user is logged in
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             } catch (UsernameNotFoundException e) {
                 logger.warn("User not found for JWT token: " + username);
             }
         }
+        // Proceed to controller
         chain.doFilter(request, response);
     }
 }

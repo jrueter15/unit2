@@ -15,11 +15,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class JournalEntry {
 
+    // PK
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // FK to users.id (BIGINT)
+    // FK linking journal_entries_user_id to id in users table
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
@@ -32,7 +33,7 @@ public class JournalEntry {
     @Column(length = 255)
     private String title;
 
-    // Use TEXT in MySQL; JPA @Lob maps
+    // Use TEXT in MySQL; JPA @Lob (large object for large text)
     @Lob
     @Column(columnDefinition = "TEXT")
     private String content;
