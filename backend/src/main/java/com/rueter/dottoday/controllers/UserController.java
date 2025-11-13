@@ -1,14 +1,25 @@
 package com.rueter.dottoday.controllers;
 
+import com.rueter.dottoday.dto.LoginRequest;
+import com.rueter.dottoday.dto.LoginResponse;
 import com.rueter.dottoday.models.User;
 import com.rueter.dottoday.repositories.UserRepository;
+import com.rueter.dottoday.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/users")
@@ -16,6 +27,67 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    // REGISTER (POST /users/register)
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        // Check if username already exists
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            return ResponseEntity.badRequest().body("Username already exists");
+        }
+
+        // Hash the password
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // Set enabled to true by default
+        user.setEnabled(true);
+
+        // Add default role
+        user.getAuthorities().add("ROLE_USER");
+
+        // Save user (JPA will handle authorities table)
+        User savedUser = userRepository.save(user);
+
+        return ResponseEntity.ok(savedUser);
+    }
+
+    // LOGIN (POST /users/login)
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            // Authenticate user
+            authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    loginRequest.getUsername(),
+                    loginRequest.getPassword()
+                )
+            );
+
+            // Load user details
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
+
+            // Generate JWT token
+            final String jwt = jwtUtil.generateToken(userDetails);
+
+            // Return token and username
+            return ResponseEntity.ok(new LoginResponse(jwt, userDetails.getUsername()));
+
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(401).body("Invalid username or password");
+        }
+    }
 
     // CREATE (POST)
     @PostMapping
@@ -43,7 +115,7 @@ public class UserController {
 
         if (userOptional.isPresent()) {
             User existingUser = userOptional.get();
-            existingUser.setUserName(userDetails.getUserName());
+            existingUser.setUsername(userDetails.getUsername());
             existingUser.setPassword(userDetails.getPassword());
             return ResponseEntity.ok(userRepository.save(existingUser));
         } else {
@@ -57,8 +129,21 @@ public class UserController {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
             return ResponseEntity.noContent().build();
+     
+     
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    // DELETE current user
+    @DeleteMapping("/me")
+    public ResponseEntity<String> deleteCurrentUser(Authentication authentication) {
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        userRepository.deleteById(user.getId());
+        return ResponseEntity.ok("Account deleted successfully");
     }
 }
