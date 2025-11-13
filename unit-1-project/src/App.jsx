@@ -8,9 +8,9 @@ import { BrowserRouter as Router, Routes, Route} from "react-router-dom"
 
 
 function App() {
-  // Mock backend data to pass as prop
+  // Suggestion data to pass as prop
   const suggestedDots = [
-    {id: 1, text: "Went for a walk", date: "2025-07-01" },
+    {id: 1, text: "Go for a walk", date: "2025-07-01" },
     {id: 2, text: "Read 5 pages of a book", date: "2025-07-02" },
     {id: 3, text: "Meditate for 5 minutes", date: "2025-07-03" }
   ];
@@ -35,7 +35,7 @@ function App() {
             </header>
             <main>
               <Routes>
-                {/*Shows Home with mockWins passed if authenticated*/}
+                {/*Shows Home with suggested Dots passed if authenticated*/}
                 <Route path="/" element={<Home wins={suggestedDots} />} />
                 <Route path="/home" element={<Home wins={suggestedDots} />} />
                 <Route path="/calendar-page" element={<CalendarPage wins={suggestedDots} />} />
