@@ -20,49 +20,63 @@ const SignupLogin = ({onAuthSuccess}) => {
     return null;
   };
 
-  // Handles login submission
+  const extractFormData = (e) => {
+    return {
+      username: e.target.name.value.trim(),
+      password: e.target.password.value
+    };
+  };
+
+  const storeAuthData = (response) => {
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('username', response.username);
+    onAuthSuccess();
+  }
+
+  // Handles login submission - wait for promise (async)
   const handleLogin = async (e) => {
+    // Stop the page from reloading
     e.preventDefault();
-    const username = e.target.name.value.trim();
-    const password = e.target.password.value;
+    const { username, password } = extractFormData(e);
 
     const error = validateForm({ username, password });
     if (error) {
+      // Save error message in React state - display to user
       setLoginError(error);
       return;
     }
 
+    // Tries to call backend
     try {
       const response = await authAPI.login(username, password);
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('username', response.username);
+      // Sets token and username from response into local storage and sets onAuthSuccess
+      storeAuthData(response);
+      // Clears error
       setLoginError('');
-      onAuthSuccess();
     } catch (err) {
       setLoginError(err.response?.data?.message || 'Invalid username or password');
     }
   };
 
-  // Handles signup submission
+  // Handles signup submission - wait for promise (async)
   const handleSignup = async (e) => {
+    // Stop the page from reloading
     e.preventDefault();
-    const username = e.target.name.value.trim();
-    const password = e.target.password.value;
+    const { username, password } = extractFormData(e);
 
     const error = validateForm({ username, password });
     if (error) {
+      // Save error message in React state - display to user
       setSignupError(error);
       return;
     }
 
     try {
       await authAPI.register(username, password);
-      // After successful registration, automatically log in
       const response = await authAPI.login(username, password);
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('username', response.username);
+      storeAuthData(response);
+      // After successful registration, automatically log in
       setSignupError('');
-      onAuthSuccess();
     } catch (err) {
       setSignupError(err.response?.data?.message || 'Registration failed. Username may already exist.');
     }
