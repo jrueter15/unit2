@@ -31,10 +31,6 @@ const Home = ({wins}) => {
   const [entries, setEntries] = useState([]);
   const [error, setError] = useState("");
 
-  // State for AI weekly summary
-  const [weeklySummary, setWeeklySummary] = useState("");
-  const [loadingSummary, setLoadingSummary] = useState(false);
-
   // No longer syncs logs to local storage, but fetches all entries on mount
   // Uses api.js
   useEffect(() => {
@@ -63,7 +59,9 @@ const Home = ({wins}) => {
 
   // Function for adding a journal entry
   const addLog = async (e) => {
+    // Prevent page reload
     e.preventDefault();
+    // Checks if input is input, if not try createEntry
     if(inputValue.trim() !== ""){
       try {
         const newEntry = await api.journalAPI.createEntry({
@@ -71,9 +69,11 @@ const Home = ({wins}) => {
           title: "" // Potential title field
         });
         setEntries((prevEntries) => [...prevEntries, newEntry]);
+        // Resets value - new blank field
         setInputValue("");
         setError("");
 
+        // Random # between 0-1, multiplied by the length of the array, rounded down by floor, pulls message from that position in array
         const randomMessage = encouragingMessageArray[Math.floor(Math.random() * encouragingMessageArray.length)];
         setEncouragement(randomMessage);
       } catch (err) {
@@ -113,11 +113,13 @@ const Home = ({wins}) => {
     }
   };
 
+  // function to handle the delete click that opens the modal and sets the entry
   const handleDeleteClick = (id) => {
     setEntryToDelete(id);
     setIsModalOpen(true);
   };
 
+  // function to handle the actual deleting. Filtering out the entry to delete from the entries state array, closing modal, clearing entry to delete
   const handleConfirmDelete = async () => {
     try {
       await api.journalAPI.deleteEntry(entryToDelete);
@@ -142,21 +144,6 @@ const Home = ({wins}) => {
       minute: '2-digit',
       hour12: true
     });
-  };
-
-  // Function to fetch AI weekly summary
-  const fetchWeeklySummary = async () => {
-    setLoadingSummary(true);
-    try {
-      const summary = await api.journalAPI.getWeeklySummary();
-      setWeeklySummary(summary);
-      setError("");
-    } catch (err) {
-      console.error('Error fetching weekly summary:', err);
-      setError('Failed to generate weekly summary.');
-    } finally {
-      setLoadingSummary(false);
-    }
   };
 
   return (
@@ -192,7 +179,7 @@ const Home = ({wins}) => {
           </ul>
       </div>
 
-      {/* Form to add a  new log */}
+      {/* Form to add a new log */}
       <form onSubmit={addLog} className="daily-log-input">
         <h1>Dot Log - What's your dot today?</h1>
         <textarea
@@ -210,11 +197,7 @@ const Home = ({wins}) => {
       {/* Display list of journal entries */}
       <div className="daily-log-output">
         <h1>Dot Archive ({entries.length})</h1>
-        <div className="dots-archive">
-            {entries.map((entry) => (
-              <span key={entry.id}>•</span>
-            ))}
-        </div>
+
         <ol>
           {entries.map((entry) =>
             <li key={entry.id}>
@@ -224,6 +207,7 @@ const Home = ({wins}) => {
                     type="text"
                     value={tempEditValue}
                     onChange={handleEditChange}
+                    style={{ width: "90%", padding: "8px", fontSize: "1rem" }}
                   />
                   <Button
                     text="Save"
@@ -247,22 +231,6 @@ const Home = ({wins}) => {
             </li>
           )}
         </ol>
-      </div>
-
-      {/* AI Weekly Summary */}
-      <div className="weekly-summary">
-        <br></br>
-        <h2>AI Weekly Summary</h2>
-        <Button
-          text={loadingSummary ? "Generating..." : "Generate Weekly Summary"}
-          onClick={fetchWeeklySummary}
-          disabled={loadingSummary}
-        />
-        {weeklySummary && (
-          <div className="summary-content">
-            <p>{weeklySummary}</p>
-          </div>
-        )}
       </div>
 
     </div>
