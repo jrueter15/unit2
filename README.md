@@ -51,7 +51,6 @@ Dot.Today is a full-stack habit journal that helps people build better identitie
 
 - Secure JWT Authentication - Spring Security with JWT Tokens, password encryption, and user-specific access controls
 - RESTful Journal Entry API - Full CRUD operations (Create, Read, Update, Delete) for journal entries with persistence, Flyway database migrations, and JPA/Hibernate ORM for data management
-- AI-Powered Weekly Summaries - Google Gemini AI analyzes the past week of entries and generates a summary
 
 ## Technologies
 
@@ -60,7 +59,9 @@ Dot.Today is a full-stack habit journal that helps people build better identitie
 - JavaScript
 - React
 - React Router
+- React Calendar
 - Vite
+- Axios
 - HTML
 - CSS
 
@@ -68,10 +69,13 @@ Dot.Today is a full-stack habit journal that helps people build better identitie
 
 - Java
 - Spring Boot
+- Spring Web
+- Spring Data JPA
+- Spring Security and JWT
 - Maven
 - Hibernate
-- Spring Security
 - MySQL
+- Flyway
 
 ## Setup
 
@@ -97,7 +101,7 @@ cd unit2
 
 - Setup instructions
 
-  - Configure MySQL using a CLI install
+  - Configure MySQL using a CLI (command line interface) install
   - Run `mysql_secure_installation` to configure the new install
   - Set a root password
   - Disallow remote root login
@@ -154,7 +158,8 @@ Navigate to the backend and build the project:
 
 ```bash
 cd backend
-./mvn clean install
+./mvnw clean install
+(if this doesn't work try 'mvn clean install' if you have maven properly installed)
 ```
 
 Configure database connection in `src/main/resources/application.properties` if needed
@@ -162,7 +167,9 @@ Configure database connection in `src/main/resources/application.properties` if 
 Start the Spring Boot application:
 
 ```bash
-./mvn spring-boot:run
+./mvnw spring-boot:run
+or 
+mvn spring-boot:run
 ```
 
 The backend API is at `http://localhost:8080`
@@ -172,7 +179,7 @@ The backend API is at `http://localhost:8080`
 Navigate to the frontend:
 
 ```bash
-cd unit-1-project
+cd ../unit-1-project
 ```
 
 Install dependencies:
@@ -192,7 +199,7 @@ The frontend is at `http://localhost:5173`
 ### 5. Verify Installation
 
 - Go to `http://localhost:5173` in your browser
-- You should see the Dot.Today landing page
+- You should see the sign-up/login page
 - Try registering an account and/or logging in
 - The backend API endpoints are at `http://localhost:8080/api`
 
@@ -202,10 +209,14 @@ The frontend is at `http://localhost:5173`
 
 ```bash
 # Build the project
-./mvn clean package
+./mvnw clean package
+or 
+mvn clean package
 
 # Run the application
-./mvn spring-boot:run
+./mvnw spring-boot:run
+or 
+mvn spring-boot:run
 ```
 
 ### Frontend (from `/unit-1-project` directory)
@@ -239,6 +250,7 @@ npm run dev
 - In-depth UI dashboard to watch categorized entries add up in a specific area
 - Search or sorting of entries
 - Prompts to get the user started
+- AI summaries of week
 - AI prompts to cue reflections
 - AI soundboard for reflection and discussion
 - Sharing with others feature to create a community
