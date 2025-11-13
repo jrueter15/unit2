@@ -23,24 +23,25 @@ const CalendarPage = () => {
         fetchEntries();
     }, []);
 
+    // DRY - check if two dates are the same day
+    const compareDay = (date1, date2) => {
+        return date1.getDate() === date2.getDate() &&
+               date1.getMonth() === date2.getMonth() &&
+               date1.getFullYear() === date2.getFullYear();
+    };
+
     // Check if a date has entries
     const hasEntriesOnDate = (date) => {
-        return entries.some(entry => {
-            const entryDate = new Date(entry.dateCreated);
-            return entryDate.getDate() === date.getDate() &&
-                   entryDate.getMonth() === date.getMonth() &&
-                   entryDate.getFullYear() === date.getFullYear();
-        });
+        return entries.some(entry =>
+            compareDay(new Date(entry.dateCreated), date)
+        );
     };
 
     // Get entries for a specific date
     const getEntriesForDate = (date) => {
-        return entries.filter(entry => {
-            const entryDate = new Date(entry.dateCreated);
-            return entryDate.getDate() === date.getDate() &&
-                   entryDate.getMonth() === date.getMonth() &&
-                   entryDate.getFullYear() === date.getFullYear();
-        });
+        return entries.filter(entry =>
+            compareDay(new Date(entry.dateCreated), date)
+        );
     };
 
     // Handle date click
