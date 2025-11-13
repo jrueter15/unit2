@@ -13,7 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/journal-entries")
+@RequestMapping("api/journal-entries")
 public class JournalEntryController {
 
     @Autowired
