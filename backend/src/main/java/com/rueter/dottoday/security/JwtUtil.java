@@ -20,13 +20,13 @@ public class JwtUtil {
     // Secret key for signing tokens should move it to application.properties later
     private String SECRET_KEY = "SecretKeyForJWTTokenGeneration";
 
-    // Generate token for user
+    // Generate token for user - what's included in the JWT
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userDetails.getUsername());
     }
 
-    // Create token with claims
+    // Create token with claims - how the JWT is built and signed
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
